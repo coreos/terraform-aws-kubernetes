@@ -1,10 +1,22 @@
 # Install Tectonic on AWS with Terraform
 
-Use this guide to manually install a Tectonic cluster on an AWS account. To install Tectonic on AWS with a graphical installer instead, refer to the [AWS graphical installer documentation][aws-gui].
+This module deploys a [Tectonic][tectonic] Kubernetes cluster on an AWS account using [Terraform][terraform]. Tectonic is an enterprise-ready distribution of Kubernetes including automatic updates, monitoring and alerting, integration with common authentication regimes, and a graphical console for managing clusters in a web browser.
 
-Generally, the AWS platform templates adhere to the standards defined by the project [conventions][conventions] and [generic platform requirements][generic]. This document aims to document the implementation details specific to the AWS platform.
+This module can deploy either a complete Tectonic cluster, requiring a Tectonic license, or a "stock" Kubernetes cluster without Tectonic features.
+
+To install Tectonic on AWS with a graphical installer instead, refer to the [Tectonic graphical installer documentation][aws-gui].
+
+The AWS platform templates adhere to the standards defined by the project [conventions][conventions] and [generic platform requirements][generic]. This document details the specifics of the AWS platform.
 
 ## Getting Started
+
+### Customize the deployment
+
+Customizations to the base installation are made to the Terraform variables for each deployment. Examples of the the Tectonic-specific variables are provided in the file `examples/kubernetes.tf`.
+
+Edit the parameters with your AWS details, domain name, and [Tectonic license][register]. To install a basic Kubernetes cluster without Tectonic features, set the `tectonic_vanilla_k8s` key to `true` and omit the Tectonic license.
+
+[View all of the AWS specific options and the common Tectonic variables][vars].
 
 ### Initialize and configure Terraform
 
@@ -17,43 +29,18 @@ $ terraform init
 Downloading modules...
 Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
 Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
-Get: git::https://github.com/coreos/tectonic-installer.git?ref=1d75718d96c7bdec04d5ffb8a72fa059b1fcb79a
+...
 
 Initializing provider plugins...
 - Downloading plugin for provider "template"...
 - Downloading plugin for provider "ignition"...
-- Downloading plugin for provider "local"...
-- Downloading plugin for provider "tls"...
-- Downloading plugin for provider "null"...
-- Downloading plugin for provider "random"...
-- Downloading plugin for provider "archive"...
 - Downloading plugin for provider "aws"...
 ...
 ```
 
-Next, specify the cluster configuration.
+### Deploy the cluster
 
-## Customize the deployment
-
-Customizations to the base installation live in `examples/terraform.tfvars`.
-Copy the example configuration:
-
-```bash
-$ cp examples/terraform.tfvars terraform.tfvars
-```
-
-Edit the parameters with your AWS details, domain name, license, etc. [View all of the AWS specific options and the common Tectonic variables][vars].
-
-## Deploy the cluster
-
-Test out the plan before deploying everything:
+Test the blueprint before deploying:
 
 ```bash
 $ terraform plan
@@ -65,13 +52,13 @@ Next, deploy the cluster:
 $ terraform apply
 ```
 
-This should run for a little bit, and when complete, your Tectonic cluster should be ready.
+This should run for a short time, and when complete, the cluster should be ready.
 
-## Access the cluster
+### Access the cluster
 
-The Tectonic Console should be up and running after the containers have downloaded. You can access it at the DNS name configured in your variables file.
+The Tectonic Console should be up and running after the containers have downloaded. You can access it at the DNS name formed by concatenating the cluster name with the domain configured in the Terraform variables.
 
-Inside of the `generated/` folder you should find any credentials, including the CA if generated, and a `kubeconfig`. You can use this to control the cluster with `kubectl`:
+Cluster credentials are written beneath the `generated/` directory, including any generated CA certificate and a `kubeconfig` file. You can use this to access the cluster with `kubectl`. This is the only method of access for a Kubernetes cluster installed without Tectonic features:
 
 ```bash
 $ export KUBECONFIG=generated/auth/kubeconfig
@@ -84,7 +71,7 @@ For more information on working with installed clusters, see [Scaling Tectonic A
 
 ## Known issues and workarounds
 
-See the [troubleshooting][troubleshooting] document for workarounds for bugs that are being tracked.
+See the [troubleshooting][troubleshooting] document for workarounds and known issues.
 
 
 [conventions]: https://github.com/coreos/tectonic-docs/blob/master/Documentation/conventions.md
@@ -100,3 +87,4 @@ See the [troubleshooting][troubleshooting] document for workarounds for bugs tha
 [scale-aws]: https://github.com/coreos/tectonic-docs/blob/master/Documentation/admin/aws-scale.md
 [release-notes]: https://coreos.com/tectonic/releases/
 [verification-key]: https://coreos.com/security/app-signing-key/
+[tectonic]: https://coreos.com/tectonic/
