@@ -6,7 +6,7 @@ provider "aws" {
 data "aws_availability_zones" "azs" {}
 
 module "vpc" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/vpc?ref=da99443f9a0b62f473b21e26d7d29c90959d8538"
+  source = "github.com/coreos/tectonic-installer//modules/aws/vpc?ref=8704f5e0996a96389690c85e98e02824aef06b3a"
 
   cidr_block   = "${var.tectonic_aws_vpc_cidr_block}"
   base_domain  = "${var.tectonic_base_domain}"
@@ -53,7 +53,7 @@ module "vpc" {
 }
 
 module "etcd" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/etcd?ref=da99443f9a0b62f473b21e26d7d29c90959d8538"
+  source = "github.com/coreos/tectonic-installer//modules/aws/etcd?ref=8704f5e0996a96389690c85e98e02824aef06b3a"
 
   instance_count = "${var.tectonic_experimental ? 0 : var.tectonic_etcd_count > 0 ? var.tectonic_etcd_count : length(data.aws_availability_zones.azs.names) == 5 ? 5 : 3}"
   ec2_type       = "${var.tectonic_aws_etcd_ec2_type}"
@@ -84,7 +84,7 @@ module "etcd" {
 }
 
 module "ignition_masters" {
-  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=da99443f9a0b62f473b21e26d7d29c90959d8538"
+  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=8704f5e0996a96389690c85e98e02824aef06b3a"
 
   cloud_provider       = "aws"
   container_images     = "${var.tectonic_container_images}"
@@ -97,7 +97,7 @@ module "ignition_masters" {
 }
 
 module "masters" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/master-asg?ref=da99443f9a0b62f473b21e26d7d29c90959d8538"
+  source = "github.com/coreos/tectonic-installer//modules/aws/master-asg?ref=8704f5e0996a96389690c85e98e02824aef06b3a"
 
   api_sg_ids                   = ["${module.vpc.api_sg_id}"]
   assets_s3_location           = "${aws_s3_bucket_object.tectonic_assets.bucket}/${aws_s3_bucket_object.tectonic_assets.key}"
@@ -138,7 +138,7 @@ module "masters" {
 }
 
 module "ignition_workers" {
-  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=da99443f9a0b62f473b21e26d7d29c90959d8538"
+  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=8704f5e0996a96389690c85e98e02824aef06b3a"
 
   cloud_provider       = "aws"
   container_images     = "${var.tectonic_container_images}"
@@ -151,7 +151,7 @@ module "ignition_workers" {
 }
 
 module "workers" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/worker-asg?ref=da99443f9a0b62f473b21e26d7d29c90959d8538"
+  source = "github.com/coreos/tectonic-installer//modules/aws/worker-asg?ref=8704f5e0996a96389690c85e98e02824aef06b3a"
 
   autoscaling_group_extra_tags = "${var.tectonic_autoscaling_group_extra_tags}"
   cl_channel                   = "${var.tectonic_cl_channel}"
