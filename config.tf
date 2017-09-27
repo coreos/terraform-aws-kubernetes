@@ -58,30 +58,31 @@ variable "tectonic_container_images" {
     bootkube                     = "quay.io/coreos/bootkube:v0.6.2"
     calico                       = "quay.io/calico/node:v2.4.1"
     calico_cni                   = "quay.io/calico/cni:v1.10.0"
-    console                      = "quay.io/coreos/tectonic-console:v2.0.0"
+    console                      = "quay.io/coreos/tectonic-console:v2.0.2"
     error_server                 = "quay.io/coreos/tectonic-error-server:1.0"
     etcd                         = "quay.io/coreos/etcd:v3.1.8"
     etcd_operator                = "quay.io/coreos/etcd-operator:v0.5.0"
     flannel                      = "quay.io/coreos/flannel:v0.8.0-amd64"
     flannel_cni                  = "quay.io/coreos/flannel-cni:v0.2.0"
     heapster                     = "gcr.io/google_containers/heapster:v1.4.1"
-    hyperkube                    = "quay.io/coreos/hyperkube:v1.7.3_coreos.0"
-    identity                     = "quay.io/coreos/dex:v2.6.1"
+    hyperkube                    = "quay.io/coreos/hyperkube:v1.7.5_coreos.1"
+    identity                     = "quay.io/coreos/dex:v2.7.1"
     ingress_controller           = "gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.12"
     kenc                         = "quay.io/coreos/kenc:0.0.2"
     kubedns                      = "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.4"
     kubednsmasq                  = "gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.4"
     kubedns_sidecar              = "gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.4"
     kube_version                 = "quay.io/coreos/kube-version:0.1.0"
-    kube_version_operator        = "quay.io/coreos/kube-version-operator:v1.7.3-kvo.3"
-    node_agent                   = "quay.io/coreos/node-agent:v1.7.3-kvo.3"
+    kube_version_operator        = "quay.io/coreos/kube-version-operator:v1.7.5-kvo.6"
+    node_agent                   = "quay.io/coreos/node-agent:v1.7.5-kvo.3"
     pod_checkpointer             = "quay.io/coreos/pod-checkpointer:3517908b1a1837e78cfd041a0e51e61c7835d85f"
     stats_emitter                = "quay.io/coreos/tectonic-stats:6e882361357fe4b773adbf279cddf48cb50164c1"
     stats_extender               = "quay.io/coreos/tectonic-stats-extender:487b3da4e175da96dabfb44fba65cdb8b823db2e"
-    tectonic_channel_operator    = "quay.io/coreos/tectonic-channel-operator:0.5.3"
+    tectonic_channel_operator    = "quay.io/coreos/tectonic-channel-operator:0.5.4"
     tectonic_etcd_operator       = "quay.io/coreos/tectonic-etcd-operator:v0.0.2"
     tectonic_prometheus_operator = "quay.io/coreos/tectonic-prometheus-operator:v1.6.0"
-    tectonic_cluo_operator       = "quay.io/coreos/tectonic-cluo-operator:v0.2.0"
+    tectonic_cluo_operator       = "quay.io/coreos/tectonic-cluo-operator:v0.2.1"
+    tectonic_torcx               = "quay.io/coreos/tectonic-torcx:installer-latest"
   }
 }
 
@@ -110,11 +111,11 @@ variable "tectonic_versions" {
 
   default = {
     etcd          = "3.1.8"
-    kubernetes    = "1.7.3+tectonic.1"
+    kubernetes    = "1.7.5+tectonic.1"
     monitoring    = "1.6.0"
-    tectonic      = "1.7.3-tectonic.2"
+    tectonic      = "1.7.5-tectonic.1"
     tectonic-etcd = "0.0.1"
-    cluo          = "0.2.0"
+    cluo          = "0.2.1"
   }
 }
 
@@ -122,14 +123,17 @@ variable "tectonic_service_cidr" {
   type    = "string"
   default = "10.3.0.0/16"
 
-  description = "This declares the IP range to assign Kubernetes service cluster IPs in CIDR notation. The maximum size of this IP range is /12"
+  description = <<EOF
+(optional) This declares the IP range to assign Kubernetes service cluster IPs in CIDR notation. 
+The maximum size of this IP range is /12
+EOF
 }
 
 variable "tectonic_cluster_cidr" {
   type    = "string"
   default = "10.2.0.0/16"
 
-  description = "This declares the IP range to assign Kubernetes pod IPs in CIDR notation."
+  description = "(optional) This declares the IP range to assign Kubernetes pod IPs in CIDR notation."
 }
 
 variable "tectonic_master_count" {
@@ -292,7 +296,7 @@ variable "tectonic_cl_channel" {
   default = "stable"
 
   description = <<EOF
-The Container Linux update channel.
+(optional) The Container Linux update channel.
 
 Examples: `stable`, `beta`, `alpha`
 EOF
@@ -389,7 +393,7 @@ EOF
 variable "tectonic_stats_url" {
   type        = "string"
   default     = "https://stats-collector.tectonic.com"
-  description = "The Tectonic statistics collection URL to which to report."
+  description = "(internal) The Tectonic statistics collection URL to which to report."
 }
 
 variable "tectonic_ddns_server" {
@@ -440,8 +444,14 @@ variable "tectonic_calico_network_policy" {
   default = false
 
   description = <<EOF
-[ALPHA] If set to true, calico network policy support will be deployed.
+(optional) [ALPHA] If set to true, calico network policy support will be deployed.
 WARNING: Enabling an alpha feature means that future updates may become unsupported.
 This should only be enabled on clusters that are meant to be short-lived to begin validating the alpha feature.
 EOF
+}
+
+variable "tectonic_bootstrap_upgrade_cl" {
+  type        = "string"
+  default     = "true"
+  description = "(internal) Whether to trigger a ContainerLinux upgrade on node bootstrap."
 }
