@@ -9,11 +9,11 @@ module "kubernetes" {
   // Note: This field MUST be in all lower-case e-mail address format and set manually prior to creating the cluster.
   tectonic_admin_email = ""
 
-  // The bcrypt hash of admin user password to login to the Tectonic Console.
-  // Use the bcrypt-hash tool (https://github.com/coreos/bcrypt-tool/releases/tag/v1.0.0) to generate it.
+  // The admin user password to login to the Tectonic Console.
   // 
-  // Note: This field MUST be set manually prior to creating the cluster.
-  tectonic_admin_password_hash = ""
+  // Note: This field MUST be set manually prior to creating the cluster. Backslashes and double quotes must
+  // also be escaped.
+  tectonic_admin_password = ""
 
   // (optional) Extra AWS tags to be applied to created autoscaling group resources.
   // This is a list of maps having the keys `key`, `value` and `propagate_at_launch`.
@@ -299,7 +299,7 @@ module "kubernetes" {
   // Note: This field MUST be set manually prior to creating the cluster unless `tectonic_vanilla_k8s` is set to `true`.
   tectonic_pull_secret_path = ""
 
-  // (optional) This declares the IP range to assign Kubernetes service cluster IPs in CIDR notation. 
+  // (optional) This declares the IP range to assign Kubernetes service cluster IPs in CIDR notation.
   // The maximum size of this IP range is /12
   // tectonic_service_cidr = "10.3.0.0/16"
 

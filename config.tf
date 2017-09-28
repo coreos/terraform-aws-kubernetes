@@ -65,7 +65,7 @@ variable "tectonic_container_images" {
     flannel                      = "quay.io/coreos/flannel:v0.8.0-amd64"
     flannel_cni                  = "quay.io/coreos/flannel-cni:v0.2.0"
     heapster                     = "gcr.io/google_containers/heapster:v1.4.1"
-    hyperkube                    = "quay.io/coreos/hyperkube:v1.7.5_coreos.1"
+    hyperkube                    = "quay.io/coreos/hyperkube:v1.7.6_coreos.0"
     identity                     = "quay.io/coreos/dex:v2.7.1"
     ingress_controller           = "gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.12"
     kenc                         = "quay.io/coreos/kenc:0.0.2"
@@ -80,7 +80,7 @@ variable "tectonic_container_images" {
     stats_extender               = "quay.io/coreos/tectonic-stats-extender:487b3da4e175da96dabfb44fba65cdb8b823db2e"
     tectonic_channel_operator    = "quay.io/coreos/tectonic-channel-operator:0.5.4"
     tectonic_etcd_operator       = "quay.io/coreos/tectonic-etcd-operator:v0.0.2"
-    tectonic_prometheus_operator = "quay.io/coreos/tectonic-prometheus-operator:v1.6.0"
+    tectonic_prometheus_operator = "quay.io/coreos/tectonic-prometheus-operator:v1.6.1"
     tectonic_cluo_operator       = "quay.io/coreos/tectonic-cluo-operator:v0.2.1"
     tectonic_torcx               = "quay.io/coreos/tectonic-torcx:installer-latest"
   }
@@ -112,7 +112,7 @@ variable "tectonic_versions" {
   default = {
     etcd          = "3.1.8"
     kubernetes    = "1.7.5+tectonic.1"
-    monitoring    = "1.6.0"
+    monitoring    = "1.6.1"
     tectonic      = "1.7.5-tectonic.1"
     tectonic-etcd = "0.0.1"
     cluo          = "0.2.1"
@@ -124,7 +124,7 @@ variable "tectonic_service_cidr" {
   default = "10.3.0.0/16"
 
   description = <<EOF
-(optional) This declares the IP range to assign Kubernetes service cluster IPs in CIDR notation. 
+(optional) This declares the IP range to assign Kubernetes service cluster IPs in CIDR notation.
 The maximum size of this IP range is /12
 EOF
 }
@@ -332,14 +332,14 @@ Note: This field MUST be in all lower-case e-mail address format and set manuall
 EOF
 }
 
-variable "tectonic_admin_password_hash" {
+variable "tectonic_admin_password" {
   type = "string"
 
   description = <<EOF
-The bcrypt hash of admin user password to login to the Tectonic Console.
-Use the bcrypt-hash tool (https://github.com/coreos/bcrypt-tool/releases/tag/v1.0.0) to generate it.
+The admin user password to login to the Tectonic Console.
 
-Note: This field MUST be set manually prior to creating the cluster.
+Note: This field MUST be set manually prior to creating the cluster. Backslashes and double quotes must
+also be escaped.
 EOF
 }
 

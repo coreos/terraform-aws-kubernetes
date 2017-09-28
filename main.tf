@@ -6,7 +6,7 @@ provider "aws" {
 data "aws_availability_zones" "azs" {}
 
 module "vpc" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/vpc?ref=20bdcd30df94e81d327976a4205cefa54b2af78b"
+  source = "github.com/coreos/tectonic-installer//modules/aws/vpc?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
 
   cidr_block   = "${var.tectonic_aws_vpc_cidr_block}"
   base_domain  = "${var.tectonic_base_domain}"
@@ -29,10 +29,10 @@ module "vpc" {
   # To enable mode A, configure a set of AZs + CIDRs for masters and workers using the
   # "tectonic_aws_master_custom_subnets" and "tectonic_aws_worker_custom_subnets" variables.
   #
-  # To enable mode B, make sure that "tectonic_aws_master_custom_subnets" and "tectonic_aws_worker_custom_subnets" 
+  # To enable mode B, make sure that "tectonic_aws_master_custom_subnets" and "tectonic_aws_worker_custom_subnets"
   # ARE NOT SET.
 
-  # These counts could be deducted by length(keys(var.tectonic_aws_master_custom_subnets)) 
+  # These counts could be deducted by length(keys(var.tectonic_aws_master_custom_subnets))
   # but there is a restriction on passing computed values as counts. This approach works around that.
   master_az_count = "${length(keys(var.tectonic_aws_master_custom_subnets)) > 0 ? "${length(keys(var.tectonic_aws_master_custom_subnets))}" : "${length(data.aws_availability_zones.azs.names)}"}"
   worker_az_count = "${length(keys(var.tectonic_aws_worker_custom_subnets)) > 0 ? "${length(keys(var.tectonic_aws_worker_custom_subnets))}" : "${length(data.aws_availability_zones.azs.names)}"}"
@@ -40,7 +40,7 @@ module "vpc" {
   # element() won't work on empty lists. See https://github.com/hashicorp/terraform/issues/11210
   master_subnets = "${concat(values(var.tectonic_aws_master_custom_subnets),list("padding"))}"
   worker_subnets = "${concat(values(var.tectonic_aws_worker_custom_subnets),list("padding"))}"
-  # The split() / join() trick works around the limitation of ternary operator expressions 
+  # The split() / join() trick works around the limitation of ternary operator expressions
   # only being able to return strings.
   master_azs = "${ split("|", "${length(keys(var.tectonic_aws_master_custom_subnets))}" > 0 ?
     join("|", keys(var.tectonic_aws_master_custom_subnets)) :
@@ -53,7 +53,7 @@ module "vpc" {
 }
 
 module "etcd" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/etcd?ref=20bdcd30df94e81d327976a4205cefa54b2af78b"
+  source = "github.com/coreos/tectonic-installer//modules/aws/etcd?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
 
   instance_count = "${var.tectonic_experimental ? 0 : var.tectonic_etcd_count > 0 ? var.tectonic_etcd_count : length(data.aws_availability_zones.azs.names) == 5 ? 5 : 3}"
   ec2_type       = "${var.tectonic_aws_etcd_ec2_type}"
@@ -84,7 +84,7 @@ module "etcd" {
 }
 
 module "ignition_masters" {
-  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=20bdcd30df94e81d327976a4205cefa54b2af78b"
+  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
 
   bootstrap_upgrade_cl = "${var.tectonic_bootstrap_upgrade_cl}"
   cloud_provider       = "aws"
@@ -99,7 +99,7 @@ module "ignition_masters" {
 }
 
 module "masters" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/master-asg?ref=20bdcd30df94e81d327976a4205cefa54b2af78b"
+  source = "github.com/coreos/tectonic-installer//modules/aws/master-asg?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
 
   api_sg_ids                   = ["${module.vpc.api_sg_id}"]
   assets_s3_location           = "${aws_s3_bucket_object.tectonic_assets.bucket}/${aws_s3_bucket_object.tectonic_assets.key}"
@@ -141,7 +141,7 @@ module "masters" {
 }
 
 module "ignition_workers" {
-  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=20bdcd30df94e81d327976a4205cefa54b2af78b"
+  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
 
   bootstrap_upgrade_cl = "${var.tectonic_bootstrap_upgrade_cl}"
   cloud_provider       = "aws"
@@ -156,7 +156,7 @@ module "ignition_workers" {
 }
 
 module "workers" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/worker-asg?ref=20bdcd30df94e81d327976a4205cefa54b2af78b"
+  source = "github.com/coreos/tectonic-installer//modules/aws/worker-asg?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
 
   autoscaling_group_extra_tags = "${var.tectonic_autoscaling_group_extra_tags}"
   cl_channel                   = "${var.tectonic_cl_channel}"
