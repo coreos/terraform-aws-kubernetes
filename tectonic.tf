@@ -1,5 +1,10 @@
+data "template_file" "etcd_hostname_list" {
+  count    = "${var.tectonic_experimental ? 0 : var.tectonic_etcd_count > 0 ? var.tectonic_etcd_count : length(data.aws_availability_zones.azs.names) == 5 ? 5 : 3}"
+  template = "${var.tectonic_cluster_name}-etcd-${count.index}.${var.tectonic_base_domain}"
+}
+
 module "kube_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/kube/self-signed?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source = "github.com/coreos/tectonic-installer//modules/tls/kube/self-signed?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
 
   ca_cert_pem        = "${var.tectonic_ca_cert}"
   ca_key_alg         = "${var.tectonic_ca_key_alg}"
@@ -9,27 +14,18 @@ module "kube_certs" {
 }
 
 module "etcd_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/etcd?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source = "github.com/coreos/tectonic-installer//modules/tls/etcd?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
 
   etcd_ca_cert_path     = "${var.tectonic_etcd_ca_cert_path}"
+  etcd_cert_dns_names   = "${data.template_file.etcd_hostname_list.*.rendered}"
   etcd_client_cert_path = "${var.tectonic_etcd_client_cert_path}"
   etcd_client_key_path  = "${var.tectonic_etcd_client_key_path}"
   self_signed           = "${var.tectonic_experimental || var.tectonic_etcd_tls_enabled}"
   service_cidr          = "${var.tectonic_service_cidr}"
-
-  etcd_cert_dns_names = [
-    "${var.tectonic_cluster_name}-etcd-0.${var.tectonic_base_domain}",
-    "${var.tectonic_cluster_name}-etcd-1.${var.tectonic_base_domain}",
-    "${var.tectonic_cluster_name}-etcd-2.${var.tectonic_base_domain}",
-    "${var.tectonic_cluster_name}-etcd-3.${var.tectonic_base_domain}",
-    "${var.tectonic_cluster_name}-etcd-4.${var.tectonic_base_domain}",
-    "${var.tectonic_cluster_name}-etcd-5.${var.tectonic_base_domain}",
-    "${var.tectonic_cluster_name}-etcd-6.${var.tectonic_base_domain}",
-  ]
 }
 
 module "ingress_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/ingress/self-signed?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source = "github.com/coreos/tectonic-installer//modules/tls/ingress/self-signed?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
 
   base_address = "${module.masters.ingress_internal_fqdn}"
   ca_cert_pem  = "${module.kube_certs.ca_cert_pem}"
@@ -38,7 +34,7 @@ module "ingress_certs" {
 }
 
 module "identity_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/identity/self-signed?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source = "github.com/coreos/tectonic-installer//modules/tls/identity/self-signed?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
 
   ca_cert_pem = "${module.kube_certs.ca_cert_pem}"
   ca_key_alg  = "${module.kube_certs.ca_key_alg}"
@@ -46,7 +42,7 @@ module "identity_certs" {
 }
 
 module "bootkube" {
-  source         = "github.com/coreos/tectonic-installer//modules/bootkube?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source         = "github.com/coreos/tectonic-installer//modules/bootkube?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
   cloud_provider = "aws"
 
   cluster_name = "${var.tectonic_cluster_name}"
@@ -112,7 +108,7 @@ module "bootkube" {
 }
 
 module "tectonic" {
-  source   = "github.com/coreos/tectonic-installer//modules/tectonic?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source   = "github.com/coreos/tectonic-installer//modules/tectonic?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
   platform = "aws"
 
   cluster_name = "${var.tectonic_cluster_name}"
@@ -158,7 +154,7 @@ module "tectonic" {
 }
 
 module "flannel-vxlan" {
-  source = "github.com/coreos/tectonic-installer//modules/net/flannel-vxlan?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source = "github.com/coreos/tectonic-installer//modules/net/flannel-vxlan?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
 
   flannel_image     = "${var.tectonic_container_images["flannel"]}"
   flannel_cni_image = "${var.tectonic_container_images["flannel_cni"]}"
@@ -166,7 +162,7 @@ module "flannel-vxlan" {
 }
 
 module "calico-network-policy" {
-  source = "github.com/coreos/tectonic-installer//modules/net/calico-network-policy?ref=abbb28f512f98c872dd66df7c5b2a42c644fea21"
+  source = "github.com/coreos/tectonic-installer//modules/net/calico-network-policy?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
 
   kube_apiserver_url = "https://${var.tectonic_aws_private_endpoints ? module.masters.api_internal_fqdn : module.masters.api_external_fqdn}:443"
   calico_image       = "${var.tectonic_container_images["calico"]}"
