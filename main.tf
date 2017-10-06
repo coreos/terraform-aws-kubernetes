@@ -6,7 +6,7 @@ provider "aws" {
 data "aws_availability_zones" "azs" {}
 
 module "vpc" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/vpc?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
+  source = "github.com/coreos/tectonic-installer//modules/aws/vpc?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
 
   cidr_block   = "${var.tectonic_aws_vpc_cidr_block}"
   base_domain  = "${var.tectonic_base_domain}"
@@ -53,7 +53,7 @@ module "vpc" {
 }
 
 module "etcd" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/etcd?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
+  source = "github.com/coreos/tectonic-installer//modules/aws/etcd?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
 
   base_domain        = "${var.tectonic_base_domain}"
   cl_channel         = "${var.tectonic_cl_channel}"
@@ -79,7 +79,7 @@ module "etcd" {
 }
 
 module "ignition_masters" {
-  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
+  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
 
   base_domain               = "${var.tectonic_base_domain}"
   bootstrap_upgrade_cl      = "${var.tectonic_bootstrap_upgrade_cl}"
@@ -100,7 +100,7 @@ module "ignition_masters" {
 }
 
 module "masters" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/master-asg?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
+  source = "github.com/coreos/tectonic-installer//modules/aws/master-asg?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
 
   api_sg_ids                   = ["${module.vpc.api_sg_id}"]
   assets_s3_location           = "${aws_s3_bucket_object.tectonic_assets.bucket}/${aws_s3_bucket_object.tectonic_assets.key}"
@@ -142,7 +142,7 @@ module "masters" {
 }
 
 module "ignition_workers" {
-  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
+  source = "github.com/coreos/tectonic-installer//modules/ignition?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
 
   bootstrap_upgrade_cl = "${var.tectonic_bootstrap_upgrade_cl}"
   cloud_provider       = "aws"
@@ -157,7 +157,7 @@ module "ignition_workers" {
 }
 
 module "workers" {
-  source = "github.com/coreos/tectonic-installer//modules/aws/worker-asg?ref=2861140d7fdc93ca33597e331628b28f0bfe040c"
+  source = "github.com/coreos/tectonic-installer//modules/aws/worker-asg?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
 
   autoscaling_group_extra_tags = "${var.tectonic_autoscaling_group_extra_tags}"
   cl_channel                   = "${var.tectonic_cl_channel}"

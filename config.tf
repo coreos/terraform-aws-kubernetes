@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.10.4"
+  required_version = ">= 0.10.7"
 }
 
 provider "archive" {
@@ -58,7 +58,7 @@ variable "tectonic_container_images" {
     bootkube                     = "quay.io/coreos/bootkube:v0.6.2"
     calico                       = "quay.io/calico/node:v2.4.1"
     calico_cni                   = "quay.io/calico/cni:v1.10.0"
-    console                      = "quay.io/coreos/tectonic-console:v2.0.3"
+    console                      = "quay.io/coreos/tectonic-console:v2.1.1"
     error_server                 = "quay.io/coreos/tectonic-error-server:1.0"
     etcd                         = "quay.io/coreos/etcd:v3.1.8"
     etcd_operator                = "quay.io/coreos/etcd-operator:v0.5.0"
@@ -73,7 +73,7 @@ variable "tectonic_container_images" {
     kubednsmasq                  = "gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.5"
     kubedns_sidecar              = "gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.5"
     kube_version                 = "quay.io/coreos/kube-version:0.1.0"
-    kube_version_operator        = "quay.io/coreos/kube-version-operator:v1.7.5-kvo.6"
+    kube_version_operator        = "quay.io/coreos/kube-version-operator:v1.7.5-kvo.10"
     node_agent                   = "quay.io/coreos/node-agent:v1.7.5-kvo.3"
     pod_checkpointer             = "quay.io/coreos/pod-checkpointer:3517908b1a1837e78cfd041a0e51e61c7835d85f"
     stats_emitter                = "quay.io/coreos/tectonic-stats:6e882361357fe4b773adbf279cddf48cb50164c1"
