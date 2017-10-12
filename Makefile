@@ -1,12 +1,12 @@
-.PHONY: all checkout docs examples latest test update
+.PHONY: all checkout docs examples tag test update
 
 TF_DOCS := $(shell which terraform-docs 2> /dev/null)
 TF_EXAMPLES := $(shell which terraform-examples 2> /dev/null)
-TF_CMD = terraform
-PLATFORM = AWS
-PROVIDER = aws
-LATEST_REF = $(shell curl --silent https://api.github.com/repos/coreos/tectonic-installer/git/refs/heads/master | jq -r '.object.sha')
-LATEST_TAG = $(shell curl --silent https://api.github.com/repos/coreos/tectonic-installer/git/refs/tags | jq -r '.[-1].ref' | sed 's|refs/tags/||')
+TF_CMD := terraform
+PLATFORM := AWS
+PROVIDER := aws
+LATEST_REF := $(shell curl --silent https://api.github.com/repos/coreos/tectonic-installer/git/refs/heads/master | jq -r '.object.sha')
+TAG ?= $(shell curl --silent https://api.github.com/repos/coreos/tectonic-installer/git/refs/tags | jq -r '.[-1].ref' | sed 's|refs/tags/||')
 
 all: update
 
@@ -71,7 +71,7 @@ update: | checkout build/$(LATEST_REF) docs examples
 	@git add .
 	@git commit -m "bump master to: $(LATEST_REF)"
 
-latest:	| ref/$(LATEST_TAG) docs examples
+tag: | ref/$(TAG) docs examples
 	@git add .
-	@git commit -m "$(LATEST_TAG)"
-	@git tag -s -m "$(LATEST_TAG)" "$(LATEST_TAG)"
+	@git commit -m "$(TAG)"
+	@git tag -s -m "$(TAG)" "$(TAG)"
