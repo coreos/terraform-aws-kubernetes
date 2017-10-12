@@ -4,7 +4,7 @@ data "template_file" "etcd_hostname_list" {
 }
 
 module "kube_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/kube/self-signed?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+  source = "github.com/coreos/tectonic-installer//modules/tls/kube/self-signed?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
 
   ca_cert_pem        = "${var.tectonic_ca_cert}"
   ca_key_alg         = "${var.tectonic_ca_key_alg}"
@@ -14,7 +14,7 @@ module "kube_certs" {
 }
 
 module "etcd_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/etcd?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+  source = "github.com/coreos/tectonic-installer//modules/tls/etcd?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
 
   etcd_ca_cert_path     = "${var.tectonic_etcd_ca_cert_path}"
   etcd_cert_dns_names   = "${data.template_file.etcd_hostname_list.*.rendered}"
@@ -25,7 +25,7 @@ module "etcd_certs" {
 }
 
 module "ingress_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/ingress/self-signed?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+  source = "github.com/coreos/tectonic-installer//modules/tls/ingress/self-signed?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
 
   base_address = "${module.masters.ingress_internal_fqdn}"
   ca_cert_pem  = "${module.kube_certs.ca_cert_pem}"
@@ -34,7 +34,7 @@ module "ingress_certs" {
 }
 
 module "identity_certs" {
-  source = "github.com/coreos/tectonic-installer//modules/tls/identity/self-signed?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+  source = "github.com/coreos/tectonic-installer//modules/tls/identity/self-signed?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
 
   ca_cert_pem = "${module.kube_certs.ca_cert_pem}"
   ca_key_alg  = "${module.kube_certs.ca_key_alg}"
@@ -42,7 +42,7 @@ module "identity_certs" {
 }
 
 module "bootkube" {
-  source         = "github.com/coreos/tectonic-installer//modules/bootkube?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+  source         = "github.com/coreos/tectonic-installer//modules/bootkube?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
   cloud_provider = "aws"
 
   cluster_name = "${var.tectonic_cluster_name}"
@@ -108,7 +108,7 @@ module "bootkube" {
 }
 
 module "tectonic" {
-  source   = "github.com/coreos/tectonic-installer//modules/tectonic?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+  source   = "github.com/coreos/tectonic-installer//modules/tectonic?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
   platform = "aws"
 
   cluster_name = "${var.tectonic_cluster_name}"
@@ -154,22 +154,28 @@ module "tectonic" {
   image_re = "${var.tectonic_image_re}"
 }
 
-module "flannel-vxlan" {
-  source = "github.com/coreos/tectonic-installer//modules/net/flannel-vxlan?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+module "flannel_vxlan" {
+  source = "github.com/coreos/tectonic-installer//modules/net/flannel-vxlan?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
 
-  flannel_image     = "${var.tectonic_container_images["flannel"]}"
-  flannel_cni_image = "${var.tectonic_container_images["flannel_cni"]}"
-  cluster_cidr      = "${var.tectonic_cluster_cidr}"
+  cluster_cidr     = "${var.tectonic_cluster_cidr}"
+  enabled          = "${var.tectonic_networking == "flannel"}"
+  container_images = "${var.tectonic_container_images}"
 }
 
-module "calico-network-policy" {
-  source = "github.com/coreos/tectonic-installer//modules/net/calico-network-policy?ref=8f99e5389c90e1fa6038ef5b909508dd486a7c3c"
+module "calico" {
+  source = "github.com/coreos/tectonic-installer//modules/net/calico?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
 
-  kube_apiserver_url = "https://${var.tectonic_aws_private_endpoints ? module.masters.api_internal_fqdn : module.masters.api_external_fqdn}:443"
-  calico_image       = "${var.tectonic_container_images["calico"]}"
-  calico_cni_image   = "${var.tectonic_container_images["calico_cni"]}"
-  cluster_cidr       = "${var.tectonic_cluster_cidr}"
-  enabled            = "${var.tectonic_calico_network_policy}"
+  container_images = "${var.tectonic_container_images}"
+  cluster_cidr     = "${var.tectonic_cluster_cidr}"
+  enabled          = "${var.tectonic_networking == "calico"}"
+}
+
+module "canal" {
+  source = "github.com/coreos/tectonic-installer//modules/net/canal?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
+
+  container_images = "${var.tectonic_container_images}"
+  cluster_cidr     = "${var.tectonic_cluster_cidr}"
+  enabled          = "${var.tectonic_networking == "canal"}"
 }
 
 data "archive_file" "assets" {
@@ -186,5 +192,5 @@ data "archive_file" "assets" {
   # Additionally, data sources do not support managing any lifecycle whatsoever,
   # and therefore, the archive is never deleted. To avoid cluttering the module
   # folder, we write it in the Terraform managed hidden folder `.terraform`.
-  output_path = "./.terraform/generated_${sha1("${module.etcd_certs.id} ${module.tectonic.id} ${module.bootkube.id} ${module.flannel-vxlan.id} ${module.calico-network-policy.id}")}.zip"
+  output_path = "./.terraform/generated_${sha1("${module.etcd_certs.id} ${module.tectonic.id} ${module.bootkube.id} ${module.flannel_vxlan.id} ${module.calico.id} ${module.canal.id}")}.zip"
 }
