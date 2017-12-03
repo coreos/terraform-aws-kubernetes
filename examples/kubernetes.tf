@@ -2,19 +2,6 @@
 module "kubernetes" {
   source = "coreos/kubernetes/aws"
 
-  // The e-mail address used to:
-  // 1. login as the admin user to the Tectonic Console.
-  // 2. generate DNS zones for some providers.
-  // 
-  // Note: This field MUST be in all lower-case e-mail address format and set manually prior to creating the cluster.
-  tectonic_admin_email = ""
-
-  // The admin user password to login to the Tectonic Console.
-  // 
-  // Note: This field MUST be set manually prior to creating the cluster. Backslashes and double quotes must
-  // also be escaped.
-  tectonic_admin_password = ""
-
   // (optional) Extra AWS tags to be applied to created autoscaling group resources.
   // This is a list of maps having the keys `key`, `value` and `propagate_at_launch`.
   // 
@@ -24,7 +11,6 @@ module "kubernetes" {
 
   // (optional) Unique name under which the Amazon S3 bucket will be created. Bucket name must start with a lower case name and is limited to 63 characters.
   // The Tectonic Installer uses the bucket to store tectonic assets and kubeconfig.
-  // 
   // If name is not provided the installer will construct the name using "tectonic_cluster_name", current AWS region and "tectonic_base_domain"
   // tectonic_aws_assets_s3_bucket_name = ""
 
@@ -111,6 +97,10 @@ module "kubernetes" {
   // (optional) If set to true, create private-facing ingress resources (ELB, A-records).
   // If set to false, no private-facing ingress resources will be provisioned and all DNS records will be created in the public Route53 zone.
   // tectonic_aws_private_endpoints = true
+
+
+  // (optional) This declares the AWS credentials profile to use.
+  // tectonic_aws_profile = "default"
 
 
   // (optional) If set to true, create public-facing ingress resources (ELB, A-records).
@@ -212,6 +202,10 @@ module "kubernetes" {
   // Examples: `latest`, `1465.6.0`
   tectonic_container_linux_version = "latest"
 
+  // (optional) A list of PEM encoded CA files that will be installed in /etc/ssl/certs on etcd, master, and worker nodes.
+  // tectonic_custom_ca_pem_list = ""
+
+
   // (optional) This only applies if you use the modules/dns/ddns module.
   // 
   // Specifies the RFC2136 Dynamic DNS server key algorithm.
@@ -240,10 +234,18 @@ module "kubernetes" {
   // tectonic_dns_name = ""
 
 
+  // (optional) The size in MB of the PersistentVolume used for handling etcd backups.
+  // tectonic_etcd_backup_size = "512"
+
+
+  // (optional) The name of an existing Kubernetes StorageClass that will be used for handling etcd backups.
+  // tectonic_etcd_backup_storage_class = ""
+
+
   // (optional) The path of the file containing the CA certificate for TLS communication with etcd.
   // 
   // Note: This works only when used in conjunction with an external etcd cluster.
-  // If set, the variables `tectonic_etcd_servers`, `tectonic_etcd_client_cert_path`, and `tectonic_etcd_client_key_path` must also be set.
+  // If set, the variable `tectonic_etcd_servers` must also be set.
   // tectonic_etcd_ca_cert_path = "/dev/null"
 
 
@@ -268,18 +270,18 @@ module "kubernetes" {
 
   // (optional) List of external etcd v3 servers to connect with (hostnames/IPs only).
   // Needs to be set if using an external etcd cluster.
+  // Note: If this variable is defined, the installer will not create self-signed certs.
+  // To provide a CA certificate to trust the etcd servers, set "tectonic_etcd_ca_cert_path".
   // 
   // Example: `["etcd1", "etcd2", "etcd3"]`
   // tectonic_etcd_servers = ""
 
 
-  // (optional) If set to `true`, TLS secure communication for self-provisioned etcd. will be used.
+  // (optional) If set to `true`, all etcd endpoints will be configured to use the "https" scheme.
   // 
   // Note: If `tectonic_experimental` is set to `true` this variable has no effect, because the experimental self-hosted etcd always uses TLS.
   // tectonic_etcd_tls_enabled = true
 
-  // If set to true, experimental Tectonic assets are being deployed.
-  tectonic_experimental = false
   // The path to the tectonic licence file.
   // You can download the Tectonic license file from your Account overview page at [1].
   // 
@@ -318,6 +320,10 @@ module "kubernetes" {
   // The maximum size of this IP range is /12
   // tectonic_service_cidr = "10.3.0.0/16"
 
+  // Validity period of the self-signed certificates (in hours).
+  // Default is 3 years.
+  // This setting is ignored if user provided certificates are used.
+  tectonic_tls_validity_period = "26280"
   // If set to true, a vanilla Kubernetes cluster will be deployed, omitting any Tectonic assets.
   tectonic_vanilla_k8s = false
   // The number of worker nodes to be created.
