@@ -6,10 +6,10 @@ provider "aws" {
 data "aws_availability_zones" "azs" {}
 
 module "container_linux" {
-  source = "github.com/coreos/tectonic-installer//modules/container_linux?ref=5dd9b5f4b0e45cbd53cad66688bdc637ba9fe35d"
+  source = "github.com/coreos/tectonic-installer//modules/container_linux?ref=0a22c73d39f67ba4bb99106a9e72322a47179736"
 
-  channel = "${var.tectonic_container_linux_channel}"
-  version = "${var.tectonic_container_linux_version}"
+  release_channel = "${var.tectonic_container_linux_channel}"
+  release_version = "${var.tectonic_container_linux_version}"
 }
 
 module "vpc" {
